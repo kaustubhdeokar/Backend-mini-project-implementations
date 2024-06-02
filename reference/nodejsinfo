@@ -1,9 +1,0 @@
-Info
-
-after installing the dependencies as the nodemon and the uuid ,
-if we change the system or in any case the dependencies are not isntalled we can
-just type NPM INSTALL so that it acn be installed again.
-
-If we want the server to change dynamically
-then what we can do is run it with nodemon by changing it in scripts
-start as node index and dev as nodemon index

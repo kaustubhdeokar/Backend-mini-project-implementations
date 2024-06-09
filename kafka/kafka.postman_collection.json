@@ -1,0 +1,28 @@
+{
+	"info": {
+		"_postman_id": "e8d5a585-cd11-48ad-b734-bef4adb9ff75",
+		"name": "kafka",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "7749014"
+	},
+	"item": [
+		{
+			"name": "user receive updates",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "localhost:8081/user/update/receive"
+			},
+			"response": []
+		},
+		{
+			"name": "driver send updates",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "localhost:8082/rider/update/fetch"
+			},
+			"response": []
+		}
+	]
+}

@@ -6,10 +6,14 @@ This repository contains mini-projects developed for different things in my curr
 - architecture it follows
 - a code example - client - in (python/java) server in java - with basic setup instructions.
 
+2. kafka
+- An article describing kafka - broker, topics, consumers, producers, consumer groups, partition, failure handling in kafka from replications is described below:
+- postman api's collection. Sender api, receiver api.
+- code example, driver app sending updates to a messaging queue, client apps receiving updates from the same queue.
+
 
 Todo:
 
-2. activemq
+3. activemq
 
 
-3. kafka

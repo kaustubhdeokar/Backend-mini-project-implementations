@@ -76,7 +76,7 @@ Multiple kafka brokers form a kafka cluster - any one broker will act as the act
 ```
 ./kafka-console-consumer.sh \ --bootstrap-server localhost:29092 \ --topic kafka.learning.tweets --from-beginning
 ```
-         
+
 ### Partitions
 - Each partition has a leader broker.
 - leader takes care of replicating the partition.

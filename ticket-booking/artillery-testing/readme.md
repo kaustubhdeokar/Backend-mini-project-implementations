@@ -1,0 +1,3 @@
+- Abandoned.
+- - This is not efficient, here i will have to specify each request param manually. 
+- - Switching to locust.

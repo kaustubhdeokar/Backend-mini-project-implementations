@@ -2,3 +2,4 @@ node_modules
 reference
 logger.js
 person.js
+ticket-booking/python-locust/locust-env/

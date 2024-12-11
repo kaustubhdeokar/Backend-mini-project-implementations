@@ -1,0 +1,17 @@
+config:
+  target: 'http://localhost:8080'  # Your server URL
+  phases:
+    - duration: 60  # Duration of the test in seconds
+      arrivalRate: 100  # Number of requests per second
+
+scenarios:
+  - flow:
+      - post:
+          url: '/book-ticket'
+          json:
+            username: 'user1'
+            compartment: 'A'
+            ticketNumber: 1
+
+##### This is not efficient, here i will have to specify each request param manually. 
+### Switching to locust.

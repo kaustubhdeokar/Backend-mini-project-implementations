@@ -1,11 +1,15 @@
 package com.example.demo.service;
 
+import com.example.demo.config.RabbitMQConfig;
 import com.example.demo.dto.BookingRequest;
 import com.example.demo.model.Seat;
 import com.example.demo.model.User;
 import com.example.demo.repo.SeatRepository;
 import com.example.demo.repo.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.OptimisticLockException;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,16 +29,52 @@ public class BookingService {
         this.userService = userService;
     }
 
-    @Transactional
-    public String bookTicket(BookingRequest request) {
+    //implementation 1 - all in same queue.
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
+    public void processBooking(String message){
+        System.out.println("Received message:"+message);
+    }
 
+    private void processMessage(String message) {
+        try{
+            System.out.println("Received message:"+message);
+            String validJsonMessage = message.replace("'", "\"");
+            BookingRequest ticketRequest = new ObjectMapper().readValue(validJsonMessage, BookingRequest.class);
+            bookTicket(ticketRequest);
+            System.out.println("Processing booking for :"+ticketRequest);
+        }
+        catch (Exception e){
+            System.err.println("Failed to process message: " + e.getMessage());
+        }
+    }
+
+    //different for different compartment.
+    @RabbitListener(queues = "queue_A")
+    public void listenToQueueA(String message) {
+        System.out.println("Received message from queue_A: " + message);
+        processMessage(message);
+    }
+
+    @RabbitListener(queues = "queue_B")
+    public void listenToQueueB(String message) {
+        System.out.println("Received message from queue_B: " + message);
+        processMessage(message);
+    }
+
+    @RabbitListener(queues = "queue_C")
+    public void listenToQueueC(String message) {
+        System.out.println("Received message from queue_C: " + message);
+        processMessage(message);
+    }
+
+    public String bookTicket(BookingRequest request) {
 
         for (int attempt = 1; attempt < MAX_RETRIES; attempt += 1) {
             try {
                 // Validate user
                 Optional<User> optionalUser = userRepository.findByUsername(request.getUsername());
                 if (optionalUser.isEmpty()) {
-                    //bad design for usecase - don't want to create 10000s of users.
+                    //bad design - because i don't want to create 10000s of users.
                     userService.createUser(request.getUsername());
                 }
                 User user = userRepository.findByUsername(request.getUsername()).get();

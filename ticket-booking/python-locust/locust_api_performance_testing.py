@@ -1,35 +1,65 @@
-from locust import HttpUser, task, between
+import time
+import pika
 import random
+from locust import User, task, events
 
-class BookingUser(HttpUser):
-    # Wait time between requests for each user
-    host = 'http://localhost:8000'
-    wait_time = between(1, 1)
+class RabbitMQUser(User):
+    messages_sent  = 0
+    start_time = time.time()
+        
+    @events.test_start.add_listener
+    def on_test_start(environment, **kwargs):
+        # Establish a connection to RabbitMQ
+        connection_params = pika.ConnectionParameters('localhost')
+        RabbitMQUser.connection = pika.BlockingConnection(connection_params)
+        RabbitMQUser.channel = RabbitMQUser.connection.channel()
+
+        # Declare the exchange (if it doesn't exist)
+        RabbitMQUser.channel.exchange_declare(
+            exchange='ticket_booking_exchange',
+            exchange_type='direct',
+            durable=True
+        )
+        
+        compartments = ['A', 'B', 'C']
+        for compartment in compartments:
+            queue_name = f"queue_{compartment}"
+            RabbitMQUser.channel.queue_declare(queue=queue_name, durable=True)
+            RabbitMQUser.channel.queue_bind(
+                exchange='ticket_booking_exchange',
+                queue=queue_name,
+                routing_key=f"compartment.{compartment}"
+            )
+
+    @events.test_stop.add_listener
+    def on_test_stop(environment, **kwargs):
+        # Close the RabbitMQ connection
+        RabbitMQUser.connection.close()
 
     @task
     def book_ticket(self):
-        # Generate random compartment and seat number
-        retries = 2
-        for i in range(0, retries, 1):
-            compartment = random.choice(['A', 'B', 'C'])
-            seat_number = random.randint(1, 200)
-            username = f"user{random.randint(1, 10000)}"  # Random username for uniqueness
+        elapsed = time.time() - RabbitMQUser.start_time
+        if RabbitMQUser.messages_sent / elapsed > 10:
+            time.sleep(1)
+            return
+        
+        compartment = random.choice(['A', 'B', 'C'])
+        seat_number = random.randint(1, 200)
+        username = f"user{random.randint(1, 10000)}"
 
-            # Send POST request with randomized data
-            response = self.client.post("/api/bookings", json={
-                "username": username,
-                "compartment": compartment,
-                "seatNumber": seat_number
-            })
+        # Create message
+        message = {
+            "username": username,
+            "compartment": compartment,
+            "seatNumber": seat_number
+        }
 
-            # Optional: Log the response or handle errors
-            if response.status_code == 200:
-                print(f"Successfully booked seat {seat_number} in compartment {compartment} for {username}")
-                i=0
-                break
-            else:
-                print('i',i)
-                print('retries:', retries)
-                print(f"Failed to book seat {seat_number} in compartment {compartment} for {username}: {response.text}")
-            if(i==retries):
-                break
+        # Publish the message to RabbitMQ
+        RabbitMQUser.channel.basic_publish(
+            exchange='ticket_booking_exchange',
+            routing_key=f"compartment.{compartment}",
+            body=str(message),
+            properties=pika.BasicProperties(content_type='application/json', delivery_mode=2)
+        )
+
+        RabbitMQUser.messages_sent += 1

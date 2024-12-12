@@ -1,0 +1,32 @@
+
+jdbc - java api to connect to the database & query the database.
+	uses drivers specific to the database.
+	
+spring jdbc - no need of boilerplate code, spring handles the backend of defining a connection, handling the transactions and closing a connection and all that.
+	uses template method pattern. 
+	
+ORM
+	in this framework, a class (called as entity) is mapped to a database table. an object of the class -> a row in table.
+	when a class is mapped to a table, orm framework takes care of generating queries for us.
+	we can avoid writing sql queries here. 
+	
+	hibernate is an orm framework. 
+	
+JPA -  after seeing hibernate , java made a standard to create orm frameworks. this standard is called as JPA. java persistence api.
+	
+
+
+spring jpa
+ entity manager
+    flush - save changes done till to the database.
+    refresh - bring in the contents back from the database.
+        so any change done from entity manager, which is not flushed, will be lost as the data from the manager will be
+        retrieved and overwritten.
+    detach - looses the references which it holds.
+    
+    
+ @transactional - importance of this is the code block defining this, all transactions will go through or none will go through.
+ whenever transactional is defined, persistance context is also created. a session is created. 
+ 
+ if no transactional is defined, only entity manager can be used to interact with database.
+ using entity manger if an object isretrieved, we cannot manipulate just the fields in the object, as the session wouldn't exist after the earlier entity manger transaction is done. 

@@ -9,6 +9,18 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Seat {
+    @Override
+    public String toString() {
+        return "Seat{" +
+                "seatId=" + seatId +
+                ", compartment=" + compartment +
+                ", seatNo=" + seatNo +
+                ", isBooked=" + isBooked +
+                ", user=" + user +
+                ", version=" + version +
+                '}';
+    }
+
     @Id
     @GeneratedValue
     private Long seatId;

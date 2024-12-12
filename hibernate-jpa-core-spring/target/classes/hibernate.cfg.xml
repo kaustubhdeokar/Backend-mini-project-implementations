@@ -1,0 +1,26 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- Connection settings -->
+        <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="connection.url">jdbc:mysql://localhost:3306/hibernatejpa</property>
+        <property name="connection.username">root</property>
+        <property name="connection.password">Kaustubh1</property>
+
+        <!-- SQL dialect -->
+        <property name="dialect">org.hibernate.dialect.MySQL8Dialect</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">true</property>
+
+        <!-- Annotated entity classes -->
+        <mapping class="com.deokarkaustubh.jpahibernateindepth.entity.Passport"/>
+        <mapping class="com.deokarkaustubh.jpahibernateindepth.entity.Student"/>
+        <mapping class="com.deokarkaustubh.jpahibernateindepth.entity.Course"/>
+        <mapping class="com.deokarkaustubh.jpahibernateindepth.entity.Review"/>
+
+    </session-factory>
+</hibernate-configuration>

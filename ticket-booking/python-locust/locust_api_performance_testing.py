@@ -1,12 +1,9 @@
-import time
 import pika
 import random
 from locust import User, task, events
+import time
 
 class RabbitMQUser(User):
-    messages_sent  = 0
-    start_time = time.time()
-        
     @events.test_start.add_listener
     def on_test_start(environment, **kwargs):
         # Establish a connection to RabbitMQ
@@ -20,7 +17,8 @@ class RabbitMQUser(User):
             exchange_type='direct',
             durable=True
         )
-        
+
+        # Declare queues for each compartment
         compartments = ['A', 'B', 'C']
         for compartment in compartments:
             queue_name = f"queue_{compartment}"
@@ -38,28 +36,27 @@ class RabbitMQUser(User):
 
     @task
     def book_ticket(self):
-        elapsed = time.time() - RabbitMQUser.start_time
-        if RabbitMQUser.messages_sent / elapsed > 10:
-            time.sleep(1)
-            return
-        
+        time.sleep(1)
+        # Generate random request data
         compartment = random.choice(['A', 'B', 'C'])
-        seat_number = random.randint(1, 200)
-        username = f"user{random.randint(1, 10000)}"
+        seat_number = random.randint(1, 20)
+        userid = random.randint(1, 122200)
+        username = f"user{userid}"
 
         # Create message
         message = {
             "username": username,
             "compartment": compartment,
-            "seatNumber": seat_number
+            "seatNumber": seat_number,
+            "userid":userid
         }
 
-        # Publish the message to RabbitMQ
+        # Publish the message to the appropriate queue via routing key
         RabbitMQUser.channel.basic_publish(
             exchange='ticket_booking_exchange',
-            routing_key=f"compartment.{compartment}",
+            routing_key=f"compartment.{compartment}",  # Use routing key based on compartment
             body=str(message),
             properties=pika.BasicProperties(content_type='application/json', delivery_mode=2)
         )
 
-        RabbitMQUser.messages_sent += 1
+        print(f"Message sent to compartment {compartment}: {message}")

@@ -8,7 +8,8 @@ public class BookingRequest {
 
     @NotBlank
     private String username;
-
+    @NotBlank
+    private int userid;
     @NotBlank
     private char compartment;
 
@@ -39,6 +40,14 @@ public class BookingRequest {
 
     public void setSeatNumber(int seatNumber) {
         this.seatNumber = seatNumber;
+    }
+
+    public int getUserid() {
+        return userid;
+    }
+
+    public void setUserid(int userid) {
+        this.userid = userid;
     }
 }
 
